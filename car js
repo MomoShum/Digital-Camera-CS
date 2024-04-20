@@ -1,0 +1,251 @@
+let arrShop = [{
+    id: 1,
+    name: 'Fujifilm FinePix Z1',
+    Price: 980.00,
+    img: 'images/p1.webp'
+},
+{
+    id: 2,
+    name: 'Canon IXY DIGITAL 200a (PowerShot S200 / DIGITAL IXUS V2)',
+    Price: 1180.00,
+    img: 'images/p2.webp'
+},
+{
+    id: 3,
+    name: `Canon IXY DIGITAL 300a (PowerShot S330 / DIGITAL IXUS 330) [Read Description]`,
+    Price: 1180.00,
+    img: 'images/p3.webp'
+}, {
+    id: 4,
+    name: 'Canon PowerShot A40 CCD Digital Camera',
+    Price: 1480.00,
+    img: 'images/p4.webp'
+},
+{
+    id: 5,
+    name: 'Casio Exilim EX-Z800 CCD Digital Camera',
+    Price: 880.00,
+    img: 'images/p5.webp'
+},
+{
+    id: 6,
+    name: `Hitachi I.mega HDC-509 CCD Digital Camera`,
+    Price: 780.00,
+    img: 'images/p6.webp'
+},
+{
+    id: 7,
+    name: 'Olympus Mju 830 CCD Digital Camera',
+    Price: 70.00,
+    img: 'images/p7.webp'
+},
+{
+    id: 8,
+    name: 'Pentax Optio WP CCD Digital Camera [Read Description]',
+    Price: 680.00
+    , img: 'images/p8.webp'
+},
+{
+    id: 9,
+    name: `Olympus Mju 10 Digital Camera (u10D/u300D/S300D)`,
+    Price: 1980.00,
+    img: 'images/p9.webp'
+},
+]
+
+let banner_img = document.querySelector('#banner_img')
+
+let prev = document.querySelector('.prev')
+
+let next = document.querySelector('.next')
+
+let index = 0
+let arrImg = ['images/1.jpg', 'images/2.jpg', 'images/3.jpg', 'images/4.jpg', 'images/5.jpg']
+let time
+
+function setTime() {
+    clearInterval(time)
+    time = setInterval(() => {
+        setNext()
+    }, 1500)
+
+}
+setTime()
+
+function setImg() {
+    banner_img.src = arrImg[index]
+}
+
+function setNext() {
+    if (index > 3) {
+        index = 0
+    } else {
+        index = index + 1
+    }
+    setImg()
+}
+
+function setPrev() {
+    if (index < 1) {
+        index = 4
+    } else {
+        index = index - 1
+    }
+    setImg()
+}
+
+next.addEventListener('click', () => {
+    setNext()
+    setTime()
+})
+
+prev.addEventListener('click', () => {
+    setPrev()
+    setTime()
+})
+
+
+
+let add_btn = document.querySelectorAll('.add_btn')
+
+let shop_car_box = document.querySelector('#shop_car_box')
+let TotalHtml = document.querySelector('.Total')
+
+let Cart_shop = document.querySelector('.Cart_shop')
+let shop_car = document.querySelector('.shop_car')
+let close_btn = document.querySelector('.close_btn')
+let shopCarArr = []
+let html = ''
+let Total = 0
+for (let i = 0; i < add_btn.length; i++) {
+    add_btn[i].addEventListener('click', () => {
+        let id = arrShop[i].id
+        let obj = {
+            id: arrShop[i].id,
+            name: arrShop[i].name,
+            Price: arrShop[i].Price,
+            number: 1,
+            img: arrShop[i].img
+        }
+        if (shopCarArr.length == 0) {
+            shopCarArr.push(obj)
+            console.log(shopCarArr);
+            setHtml()
+            return
+        }
+        let flag = shopCarArr.findIndex(item => {
+            return item.id == id
+        })
+        if (flag == -1) {
+            shopCarArr.push(obj)
+        } else {
+
+            shopCarArr[flag].number++
+        }
+        console.log(shopCarArr);
+        setHtml()
+    })
+
+}
+
+
+
+
+function setHtml() {
+    html = ''
+    if (shopCarArr.length == 0) {
+        html = `
+        <div class = 'none_box'>
+        Not currently available
+        </div>
+        
+        `
+        setTotal()
+        shop_car_box.innerHTML = html
+        return
+
+    }
+    for (let i = 0; i < shopCarArr.length; i++) {
+        html += `
+                 <li>
+                     <img src="${shopCarArr[i].img}" alt="">
+                            <div class="shop_text">
+                                <h1>${shopCarArr[i].name} </h1>
+                                <div class="price_box">
+                                    <div class="price_nubmer">${shopCarArr[i].number}</div> X<span>$300.00</span>
+                                </div>
+                                <div class="count_box">
+                                    <img id="reduce_btn" src="./images/reduce.svg" alt="" data-id = ${shopCarArr[i].id} data-type = 'reduce'>
+                                    <div class="nubmer">${shopCarArr[i].number}</div>
+                                    <img id="add_btn" src="./images/add.svg" alt="" data-id = ${shopCarArr[i].id} data-type = 'add'>
+                                </div>
+                            </div>
+                            <img class="shop_del" src="./images/closer2.svg" alt="" data-id = ${shopCarArr[i].id} data-type = 'del'>
+                        </li>
+    
+    `
+
+    }
+    setTotal()
+    shop_car_box.innerHTML = html
+
+}
+setHtml()
+shop_car_box.addEventListener('click', (e) => {
+    console.log(e.target.dataset);
+    let id = e.target.dataset.id
+    let type = e.target.dataset.type
+    let index = shopCarArr.findIndex(item => {
+        return item.id == id
+    })
+    if (type == 'reduce') {
+        if (shopCarArr[index].number == 1) {
+            alert('It is already the minimum quantity')
+            return
+        }
+        shopCarArr[index].number--
+    } else if (type == 'add') {
+        shopCarArr[index].number++
+    } else if (type == 'del') {
+
+        shopCarArr.splice(index, 1);
+    }
+    setHtml()
+})
+function setTotal() {
+    Total = 0
+    for (let i = 0; i < shopCarArr.length; i++) {
+        Total += shopCarArr[i].number * shopCarArr[i].Price
+
+
+    }
+    TotalHtml.innerHTML = Total.toFixed(2) + '$'
+}
+Cart_shop.addEventListener('click', () => {
+    shop_car.style.display = 'block'
+})
+close_btn.addEventListener('click', () => {
+    shop_car.style.display = 'none'
+})
+let sort = document.querySelector('.sort')
+let nav_bar = document.querySelector('.nav_bar')
+let time_out
+
+sort.addEventListener('mouseover', () => {
+    nav_bar.style.display = 'block'
+})
+sort.addEventListener('mouseout', () => {
+    clearTimeout(time_out)
+    time_out = setTimeout(() => {
+        nav_bar.style.display = 'none'
+    }, 1500);
+})
+nav_bar.addEventListener('mouseover', () => {
+    nav_bar.style.display = 'block'
+})
+nav_bar.addEventListener('mouseout', () => {
+    clearTimeout(time_out)
+    time_out = setTimeout(() => {
+        nav_bar.style.display = 'none'
+    }, 1500);
+})
